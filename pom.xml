@@ -65,6 +65,12 @@
 			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Base en memoria para las pruebas, sin depender de MySQL local -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Pruebas Web MVC -->
 		<dependency>
@@ -103,3 +109,5 @@
 	</build>
 
 </project>
+
+
