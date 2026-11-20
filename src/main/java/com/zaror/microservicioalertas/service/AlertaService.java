@@ -40,6 +40,7 @@ public class AlertaService {
         alerta.setTipo(datos.getTipo());
         alerta.setUbicacion(datos.getUbicacion());
         alerta.setEstado(datos.getEstado());
+        // La actualización de estado conserva la evidencia y los datos originales.
         return alertaRepository.save(alerta);
     }
 

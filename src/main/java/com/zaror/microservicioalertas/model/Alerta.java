@@ -17,6 +17,13 @@ public class Alerta {
     @NotBlank private String titulo;
     @NotBlank private String descripcion;
     @NotBlank private String tipo;
-    @NotBlank private String ubicacion;
+    @NotBlank
+    @Column(columnDefinition = "TEXT")
+    private String ubicacion;
     @NotBlank private String estado;
+    private String autor;
+    private Long fecha;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String fotoBase64;
 }

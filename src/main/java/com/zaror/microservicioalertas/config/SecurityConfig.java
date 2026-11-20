@@ -29,6 +29,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/alertas").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/alertas/*").hasAnyRole("ENCARGADO", "DIRECTIVA")
                         .requestMatchers(HttpMethod.DELETE, "/alertas/*").hasAnyRole("ENCARGADO", "DIRECTIVA")
+                        .requestMatchers(HttpMethod.GET, "/fallas", "/comunicados").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/fallas").hasRole("ENCARGADO")
+                        .requestMatchers(HttpMethod.PUT, "/fallas/*/resuelta").hasRole("ENCARGADO")
+                        .requestMatchers(HttpMethod.POST, "/comunicados").hasRole("DIRECTIVA")
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").authenticated()
                         .anyRequest().denyAll())
                 .httpBasic(Customizer.withDefaults());

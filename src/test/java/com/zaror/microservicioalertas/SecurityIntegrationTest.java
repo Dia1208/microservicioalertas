@@ -13,8 +13,11 @@ import java.util.Base64;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,6 +44,15 @@ class SecurityIntegrationTest {
                 .andExpect(jsonPath("$.rol").value("VECINO"));
         mvc.perform(delete("/alertas/1").header("Authorization", basic("vecino@ejemplo.cl", "Vecino2026@")))
                 .andExpect(status().isForbidden());
+        mvc.perform(get("/fallas").header("Authorization", basic("vecino@ejemplo.cl", "Vecino2026@")))
+                .andExpect(status().isOk());
+        mvc.perform(get("/comunicados").header("Authorization", basic("vecino@ejemplo.cl", "Vecino2026@")))
+                .andExpect(status().isOk());
+        mvc.perform(post("/comunicados")
+                        .header("Authorization", basic("vecino@ejemplo.cl", "Vecino2026@"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"titulo\":\"Aviso\",\"mensaje\":\"Intento sin permisos\"}"))
+                .andExpect(status().isForbidden());
         mvc.perform(get("/alertas"))
                 .andExpect(status().isUnauthorized());
     }
@@ -50,6 +62,58 @@ class SecurityIntegrationTest {
         mvc.perform(delete("/alertas/999999")
                         .header("Authorization", basic("alejandro@directiva.cl")))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void fallasSeCompartenYSoloEncargadoPuedeGestionarlas() throws Exception {
+        String falla = "{\"componente\":\"Alumbrado\",\"detalle\":\"Luminaria apagada\",\"prioridad\":\"Alta\"}";
+        String creado = mvc.perform(post("/fallas")
+                        .header("Authorization", basic("alejandro@encargado.cl"))
+                        .contentType(MediaType.APPLICATION_JSON).content(falla))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.reportadoPor").value("alejandro@encargado.cl"))
+                .andReturn().getResponse().getContentAsString();
+        long id = new com.fasterxml.jackson.databind.ObjectMapper().readTree(creado).get("id").asLong();
+        mvc.perform(get("/fallas").header("Authorization", basic("alejandro@directiva.cl")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Luminaria apagada")));
+        mvc.perform(put("/fallas/" + id + "/resuelta")
+                        .header("Authorization", basic("alejandro@encargado.cl"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"resuelta\":true}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.resuelta").value(true));
+        mvc.perform(post("/fallas").header("Authorization", basic("alejandro@directiva.cl"))
+                        .contentType(MediaType.APPLICATION_JSON).content(falla))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void comunicadosSeCompartenYSoloDirectivaPuedePublicarlos() throws Exception {
+        String aviso = "{\"titulo\":\"Reunión\",\"mensaje\":\"Reunión mañana en la sede\"}";
+        mvc.perform(post("/comunicados").header("Authorization", basic("alejandro@directiva.cl"))
+                        .contentType(MediaType.APPLICATION_JSON).content(aviso))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.autor").value("alejandro@directiva.cl"));
+        mvc.perform(get("/comunicados").header("Authorization", basic("alejandro@encargado.cl")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Reunión mañana en la sede")));
+        mvc.perform(post("/comunicados").header("Authorization", basic("alejandro@encargado.cl"))
+                        .contentType(MediaType.APPLICATION_JSON).content(aviso))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void alertaConFotoSeConservaEnServidor() throws Exception {
+        String alerta = "{\"titulo\":\"Robo\",\"descripcion\":\"Robo en la esquina\","
+                + "\"tipo\":\"Robo\",\"ubicacion\":\"Sector norte\",\"estado\":\"Activa\","
+                + "\"fotoBase64\":\"Zm90bw==\"}";
+        mvc.perform(post("/alertas").header("Authorization", basic("alejandro@encargado.cl"))
+                        .contentType(MediaType.APPLICATION_JSON).content(alerta))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fotoBase64").value("Zm90bw=="))
+                .andExpect(jsonPath("$.autor").value("alejandro@encargado.cl"));
+        mvc.perform(get("/alertas").header("Authorization", basic("alejandro@directiva.cl")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Zm90bw==")));
     }
 
     private String basic(String correo) {

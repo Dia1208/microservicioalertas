@@ -1,6 +1,6 @@
 # Microservicio de Alertas Zaror
 
-API REST para crear, consultar, actualizar y eliminar alertas. Está desarrollada con Java 17, Spring Boot, Spring Web MVC, Spring Data JPA y MySQL.
+API REST para compartir alertas, fallas, comunicados y cuentas entre dispositivos. Está desarrollada con Java 17, Spring Boot, Spring Web MVC, Spring Data JPA y MySQL.
 
 ## Requisitos
 
@@ -27,7 +27,7 @@ $env:DB_PASSWORD = "tu_contraseña_mysql"
 
 También puedes usar `.env.example` como referencia; Spring Boot lee variables del entorno, no un archivo `.env` automáticamente. No incluyas contraseñas reales en Git. La API queda disponible en `http://localhost:8081`.
 
-La versión Android de la evaluación usa `https://52-90-150-61.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar alertas.
+La versión Android de la evaluación usa `https://52-90-150-61.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar los datos. Despliega este microservicio actualizado antes de instalar la nueva APK: la versión anterior rechaza los endpoints de fallas y comunicados.
 
 ## Servidor de demostración
 
@@ -54,9 +54,14 @@ servidor, el certificado HTTPS y la URL Android antes de generar otra APK.
 | POST | `/alertas` | Crea una alerta |
 | PUT | `/alertas/{id}` | Actualiza una alerta existente |
 | DELETE | `/alertas/{id}` | Elimina una alerta existente |
+| GET | `/fallas` | Lista fallas |
+| POST | `/fallas` | Registra una falla (Encargado/a) |
+| PUT | `/fallas/{id}/resuelta` | Cambia su estado (Encargado/a) |
+| GET | `/comunicados` | Lista comunicados |
+| POST | `/comunicados` | Publica un comunicado (Directiva) |
 
 Las rutas de alertas requieren HTTP Basic sobre HTTPS. Vecino/a puede consultar y crear;
-Encargado/a y Directiva también pueden actualizar y eliminar. El registro público
+Encargado/a y Directiva también pueden actualizar y eliminar. Los GET de fallas y comunicados requieren autenticación. El registro público
 siempre asigna Vecino/a y no acepta un rol enviado por el cliente.
 
 Ejemplo de cuerpo JSON para crear o actualizar:
@@ -67,7 +72,8 @@ Ejemplo de cuerpo JSON para crear o actualizar:
   "descripcion": "Humo visible cerca de la plaza",
   "tipo": "Incendio",
   "ubicacion": "Sector norte",
-  "estado": "Activa"
+  "estado": "Activa",
+  "fotoBase64": null
 }
 ```
 
@@ -92,7 +98,9 @@ Al iniciar el servicio se crean o actualizan estas cuentas para la evaluación a
 | Encargado/a | `alejandro@encargado.cl` | `Duoc.2026@` |
 | Directiva | `alejandro@directiva.cl` | `Duoc.2026@` |
 
-La contraseña puede cambiarse con la variable `DEMO_PASSWORD`. Las dos cuentas tienen permiso
-para consultar, crear, actualizar y eliminar alertas. Los usuarios registrados desde la app
-reciben únicamente el rol Vecino/a y pueden consultar y crear alertas.
+La contraseña puede cambiarse con la variable `DEMO_PASSWORD`. Las dos cuentas pueden
+consultar, crear, actualizar y eliminar alertas. Encargado/a registra y resuelve fallas;
+Directiva publica comunicados. Los usuarios registrados desde la app reciben únicamente
+el rol Vecino/a y pueden consultar y crear alertas. Los datos anteriores a esta versión
+que solo existen en Room no se envían automáticamente al servidor.
 

@@ -35,18 +35,23 @@ public class ApiUsuarioService implements UserDetailsService {
         usuario.setCorreo(correo);
         usuario.setClaveHash(encoder.encode(solicitud.clave()));
         usuario.setRol("VECINO");
+        usuario.setNombre(solicitud.nombre());
+        usuario.setTelefono(solicitud.telefono());
+        usuario.setDireccion(solicitud.direccion());
         try {
             usuarios.saveAndFlush(usuario);
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado");
         }
-        return new PerfilUsuario(correo, usuario.getRol());
+        return new PerfilUsuario(correo, usuario.getRol(), usuario.getNombre(),
+                usuario.getTelefono(), usuario.getDireccion());
     }
 
     public PerfilUsuario perfil(String correo) {
         ApiUsuario usuario = usuarios.findByCorreo(normalizar(correo))
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        return new PerfilUsuario(usuario.getCorreo(), usuario.getRol());
+        return new PerfilUsuario(usuario.getCorreo(), usuario.getRol(), usuario.getNombre(),
+                usuario.getTelefono(), usuario.getDireccion());
     }
 
     @Override

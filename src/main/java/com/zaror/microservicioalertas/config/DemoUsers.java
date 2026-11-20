@@ -28,6 +28,7 @@ public class DemoUsers {
         usuario.setCorreo(correo);
         usuario.setClaveHash(encoder.encode(clave));
         usuario.setRol(rol);
+        usuario.setNombre(rol.equals("DIRECTIVA") ? "Alejandro Directiva" : "Alejandro Encargado");
         usuarios.save(usuario);
     }
 }
