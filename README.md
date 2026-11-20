@@ -27,7 +27,7 @@ $env:DB_PASSWORD = "tu_contraseña_mysql"
 
 También puedes usar `.env.example` como referencia; Spring Boot lee variables del entorno, no un archivo `.env` automáticamente. No incluyas contraseñas reales en Git. La API queda disponible en `http://localhost:8081`.
 
-La versión Android de la evaluación usa `https://52-90-150-61.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar los datos. Despliega este microservicio actualizado antes de instalar la nueva APK: la versión anterior rechaza los endpoints de fallas y comunicados.
+La versión Android de la evaluación usa `https://54-82-20-127.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar los datos. Despliega este microservicio actualizado antes de instalar la nueva APK: la versión anterior rechaza los endpoints de fallas y comunicados.
 
 ## Servidor de demostración
 
