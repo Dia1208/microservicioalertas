@@ -27,17 +27,37 @@ $env:DB_PASSWORD = "tu_contraseña_mysql"
 
 También puedes usar `.env.example` como referencia; Spring Boot lee variables del entorno, no un archivo `.env` automáticamente. No incluyas contraseñas reales en Git. La API queda disponible en `http://localhost:8081`.
 
-Para la app en el emulador Android estándar, el computador se alcanza como `10.0.2.2`, por lo que la URL base es `http://10.0.2.2:8081/`. Un teléfono físico debe usar la IP local del computador y compartir su red.
+La versión Android de la evaluación usa `https://52-90-150-61.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar alertas.
+
+## Servidor de demostración
+
+La instancia EC2 publica la API mediante Nginx y un certificado HTTPS de Let's Encrypt.
+MySQL y Java corren en la misma instancia; Java escucha solo en `127.0.0.1:8081` y
+el puerto 3306 no está abierto a Internet.
+
+Los archivos de `deploy/` documentan la instalación. `bootstrap-db.sh` crea la base
+de datos y un usuario con contraseña aleatoria guardada solo en
+`/etc/alertas-zaror/app.env`. No vuelvas a ejecutarlo en una actualización normal:
+cambiaría la contraseña de MySQL. `alertas-zaror.service` inicia el JAR mediante systemd.
+
+Si la IP pública cambia al detener y reiniciar EC2, hay que actualizar el nombre del
+servidor, el certificado HTTPS y la URL Android antes de generar otra APK.
 
 ## Endpoints
 
 | Método | Ruta | Función |
 | --- | --- | --- |
+| POST | `/auth/register` | Registra un Vecino/a |
+| GET | `/auth/me` | Devuelve correo y rol del usuario autenticado |
 | GET | `/alertas` | Lista alertas |
 | GET | `/alertas/{id}` | Busca por ID |
 | POST | `/alertas` | Crea una alerta |
 | PUT | `/alertas/{id}` | Actualiza una alerta existente |
 | DELETE | `/alertas/{id}` | Elimina una alerta existente |
+
+Las rutas de alertas requieren HTTP Basic sobre HTTPS. Vecino/a puede consultar y crear;
+Encargado/a y Directiva también pueden actualizar y eliminar. El registro público
+siempre asigna Vecino/a y no acepta un rol enviado por el cliente.
 
 Ejemplo de cuerpo JSON para crear o actualizar:
 

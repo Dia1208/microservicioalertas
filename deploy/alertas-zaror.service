@@ -1,0 +1,18 @@
+[Unit]
+Description=Microservicio Alertas Zaror
+After=network-online.target mysql.service
+Requires=mysql.service
+
+[Service]
+User=ubuntu
+WorkingDirectory=/opt/alertas-zaror
+EnvironmentFile=/etc/alertas-zaror/app.env
+ExecStart=/usr/bin/java -Xms128m -Xmx384m -jar /opt/alertas-zaror/app.jar
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
