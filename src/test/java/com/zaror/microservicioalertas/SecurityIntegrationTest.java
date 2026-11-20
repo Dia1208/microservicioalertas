@@ -116,6 +116,21 @@ class SecurityIntegrationTest {
                 .andExpect(content().string(containsString("Zm90bw==")));
     }
 
+    @Test
+    void perfilDeVecinoSeRecuperaEnOtroDispositivo() throws Exception {
+        mvc.perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"correo\":\"otrovecino@ejemplo.cl\","
+                                + "\"clave\":\"Vecino2026@\",\"nombre\":\"Ana Vecina\","
+                                + "\"telefono\":\"912345678\",\"direccion\":\"Pasaje Norte\"}"))
+                .andExpect(status().isCreated());
+        mvc.perform(get("/auth/me")
+                        .header("Authorization", basic("otrovecino@ejemplo.cl", "Vecino2026@")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rol").value("VECINO"))
+                .andExpect(jsonPath("$.nombre").value("Ana Vecina"))
+                .andExpect(jsonPath("$.direccion").value("Pasaje Norte"));
+    }
+
     private String basic(String correo) {
         return basic(correo, "Duoc.2026@");
     }
