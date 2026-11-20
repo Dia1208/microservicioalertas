@@ -3,6 +3,7 @@ package com.zaror.microservicioalertas.controller;
 
 import com.zaror.microservicioalertas.model.Alerta;
 import com.zaror.microservicioalertas.service.AlertaService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class AlertaController {
 
     // Guardar una alerta
     @PostMapping
-    public Alerta guardarAlerta(@RequestBody Alerta alerta) {
+    public Alerta guardarAlerta(@Valid @RequestBody Alerta alerta) {
         return alertaService.guardarAlerta(alerta);
     }
 
@@ -39,7 +40,7 @@ public class AlertaController {
     @PutMapping("/{id}")
     public Alerta actualizarAlerta(
             @PathVariable Long id,
-            @RequestBody Alerta alerta) {
+            @Valid @RequestBody Alerta alerta) {
 
         return alertaService.actualizarAlerta(id, alerta);
     }

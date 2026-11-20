@@ -63,3 +63,16 @@ Las pruebas unitarias del servicio y la prueba de contexto usan una base H2 en m
 
 La configuración normal de ejecución continúa usando MySQL mediante las variables de entorno.
 
+## Cuentas de demostración
+
+Al iniciar el servicio se crean o actualizan estas cuentas para la evaluación académica:
+
+| Rol | Correo | Contraseña |
+| --- | --- | --- |
+| Encargado/a | `alejandro@encargado.cl` | `Duoc.2026@` |
+| Directiva | `alejandro@directiva.cl` | `Duoc.2026@` |
+
+La contraseña puede cambiarse con la variable `DEMO_PASSWORD`. Las dos cuentas tienen permiso
+para consultar, crear, actualizar y eliminar alertas. Los usuarios registrados desde la app
+reciben únicamente el rol Vecino/a y pueden consultar y crear alertas.
+
