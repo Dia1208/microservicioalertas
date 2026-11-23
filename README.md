@@ -2,6 +2,12 @@
 
 API REST para compartir alertas, fallas, comunicados y cuentas entre dispositivos. Está desarrollada con Java 17, Spring Boot, Spring Web MVC, Spring Data JPA y MySQL.
 
+## Integrantes
+
+- Diego Alejandro Gonzalez Ballesteros
+- Emanuel Orellana Gaete
+- Stefani Francisca Verdugo Toledo
+
 ## Requisitos
 
 - JDK 17.
@@ -27,7 +33,7 @@ $env:DB_PASSWORD = "tu_contraseña_mysql"
 
 También puedes usar `.env.example` como referencia; Spring Boot lee variables del entorno, no un archivo `.env` automáticamente. No incluyas contraseñas reales en Git. La API queda disponible en `http://localhost:8081`.
 
-La versión Android de la evaluación usa `https://54-82-20-127.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar los datos. Despliega este microservicio actualizado antes de instalar la nueva APK: la versión anterior rechaza los endpoints de fallas y comunicados.
+La versión Android de la evaluación usa `https://52-4-125-119.sslip.io/`, tanto en el emulador como en un teléfono físico. La instancia EC2 debe permanecer encendida para iniciar sesión y sincronizar los datos. Despliega este microservicio actualizado antes de instalar la nueva APK: la versión anterior rechaza los endpoints de fallas y comunicados.
 
 ## Servidor de demostración
 
